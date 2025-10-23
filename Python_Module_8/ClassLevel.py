@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream:Python_Module_8/ClassLevel.py
 from shutil import move
 import pygame
 from Config import *
