@@ -10,9 +10,11 @@ virusSprites = [
     ]
 
 
-class VirusRed():
+class VirusRed(pygame.sprite.Sprite):
 
     def __init__(self,position,moveRight):
+        super().__init__()
+
         # Load spritesheet
         viruspath = os.path.join(SPRITESHEET_PATH, "Enemies","Virus_Red", "virus1_red.png")
         self.flySpriteSheet = SpriteSheet(os.path.join(viruspath),virusSprites)
@@ -41,7 +43,7 @@ class VirusRed():
             self.movingRight = False
 
         #Trigger attack animation code:
-        heroRect = level.hero.rect
+        heroRect = level.hero.sprite.rect
         heroX = heroRect.centerx
         if self.currentState == 'FLY':
             if heroRect.top < self.rect.bottom <= heroRect.bottom:
@@ -63,21 +65,19 @@ class VirusRed():
                         self.currentState = 'FLY'
                         self.animationIndex = 0
 
-
-
         # Select animation for current state
         self.selectAnimation()
 
         # Animate sprite
         self.animationIndex += self.animationSpeed
         if self.animationIndex >= len(self.currentAnimation):
-            self.animationIndex = 0
+            if self.currentState == 'ATTACK':
+                self.animationIndex = len (self.currentAnimation) -1
+            else:
+                self.currentState = 'FLY'
+                self.animationIndex = 0
 
         self.image = self.currentAnimation[int(self.animationIndex)]
-
-    def draw(self,displaySurface):
-        displaySurface.blit(self.image,self.rect)
-        pass
 
     def selectAnimation(self):
         self.animationSpeed = ANIMSPEED_VIRUS

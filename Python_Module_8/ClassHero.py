@@ -32,9 +32,10 @@ attackSprites = [
 ]
 
 
-class Hero():
+class Hero(pygame.sprite.Sprite):
 
     def __init__(self, position, faceRight):
+        super().__init__()
 
         # Load Sprites
         # Paths to get the character animations
@@ -109,11 +110,6 @@ class Hero():
             self.currentState = 'IDLE'
 
         self.moveHorizontal(level)
-
-    def draw(self, displaySurface):
-        displaySurface.blit(self.image, self.rect)
-
-
 
     def selectAnimation(self):
         self.animationspeed = ANIMSPEED_HERO_DEFAULT
