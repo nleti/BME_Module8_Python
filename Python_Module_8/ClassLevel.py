@@ -13,8 +13,9 @@ class Level():
         # sets position of the virus and where it is 
         
         self.hero = Hero((400, 400), faceRight = True)
+
         # Red viruses
-        self.virus1 = VirusRed((200,200),moveRight = True)
+        self.virus1 = VirusRed((400,400),moveRight = True)
         self.virus12 = VirusRed((300,300),moveRight = False)
         
         #Green virus

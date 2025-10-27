@@ -31,6 +31,16 @@ attackSprites = [
     (676, 0, 92, 80)
 ]
 
+jumpSprites = [
+    (0, 0, 120, 64),
+    (120, 0, 120, 64),
+    (240, 0, 120, 64),
+    (360, 0, 120, 64),
+    (480, 0, 120, 64),
+    (600, 0, 120, 64),
+    (720, 0, 120, 64),
+    (840, 0, 120, 64)
+]
 
 class Hero():
 
@@ -41,15 +51,18 @@ class Hero():
         idlepath = os.path.join(SPRITESHEET_PATH, "Character","Idle", "Idle-Sheet.png")
         runpath = os.path.join(SPRITESHEET_PATH, "Character","Run","Run-Sheet.png")
         runattack = os.path.join(SPRITESHEET_PATH, "Character","Attack","AttackSheet.png")
+        jumppath = os.path.join(SPRITESHEET_PATH, "Character", "Jump","JumpSheet.png")
 
         idleSpriteSheet = SpriteSheet(idlepath, idleSprites)
         runSpriteSheet = SpriteSheet(runpath, runSprties)
         attackSpriteSheet = SpriteSheet(runattack, attackSprites)
+        jumpSpriteSheet = SpriteSheet(jumppath, jumpSprites)
 
         self.spriteSheets = {
-            'IDLE' : idleSpriteSheet,
-            'RUN' : runSpriteSheet,
-            'ATTACK' : attackSpriteSheet
+            'IDLE' : SpriteSheet(idlepath, idleSprites),
+            'RUN' : SpriteSheet(runpath, runSprties),
+            'ATTACK' : SpriteSheet(runattack, attackSprites),
+            'JUMP' : SpriteSheet(jumppath, jumpSprites)
         }
 
         self.animationIndex = 0
@@ -60,46 +73,71 @@ class Hero():
         self.xpos = position[0]
         self.ypos = position[1]
 
+        # Jump physics
+        self.yVel = 0
+        self.gravity = 0.6
+        self.jumpPower = -10
+        self.isJumping = False
+
+        #CHECK IF WORKS
+        self.animationspeed = ANIMSPEED_HERO_DEFAULT
+        self.image = None
+        self.currentAnimation = []
 
     def update(self, level):
-
         self.previousState = self.currentState
         self.xDir = 0
+        keys =pygame.key.get_pressed()
 
         if self.currentState != 'ATTACK':
-            keys =pygame.key.get_pressed()
+            # Jump 
+            if keys[pygame.K_w] and not self.isJumping:
+                self.yVel = self.jumpPower
+                self.isJumping = True
+                self.currentState = 'JUMP'
+
+            # Attack 
             if keys[pygame.K_SPACE]:
                 self.currentState = 'ATTACK'
-            elif keys[pygame.K_a]:
+
+            # Horizontal movement
+            elif keys[pygame.K_a]: # move left
                 self.xDir = -1
                 self.facingRight = False
                 self.currentState = 'RUN'
-            elif keys[pygame.K_d]:
+
+            elif keys[pygame.K_d]: # move right
                 self.xDir = 1
                 self.facingRight = True
                 self.currentState = 'RUN'
+
+            # Idle
             else:
                 self.currentState = 'IDLE'
 
         
         self.selectAnimation()
 
+        # Reset animati9on if state changed
         if self.previousState != self.currentState:
             self.animationIndex = 0
 
+        # Updates Image
+        self.image = self.currentAnimation[int(self.animationIndex)]
         
-            self.image = self.currentAnimation[int(self.animationIndex)]
-
+        # Updates rects based on state 
         if self.currentState == 'IDLE':
             self.rect = pygame.Rect(self.xpos - 22, self.ypos - 52, 44, 52)
         elif self.currentState == 'RUN':
             self.rect = pygame.Rect(self.xpos - 20, self.ypos - 48, 40, 48)
         elif self.currentState == 'ATTACK':
             self.rect =pygame.Rect(self.xpos - 44, self.ypos - 64, 88, 64)
+        elif self.currentState == "JUMP":
+            self.rect = pygame.Rect(self.xpos - 30, self.ypos - 60, 60, 60)
 
-
+        # Animation update
         self.image = self.currentAnimation[int(self.animationIndex)]
-
+    
         if self.currentState == 'IDLE':
             self.rect = pygame.Rect(self.xpos - 22, self.ypos - 52, 44, 52)
 
@@ -108,7 +146,10 @@ class Hero():
             self.animationIndex = 0
             self.currentState = 'IDLE'
 
+        # Move Hero
         self.moveHorizontal(level)
+        self.moveVertical(level)
+
 
     def draw(self, displaySurface):
         displaySurface.blit(self.image, self.rect)
@@ -116,10 +157,12 @@ class Hero():
 
 
     def selectAnimation(self):
+        # Sets animation speed
         self.animationspeed = ANIMSPEED_HERO_DEFAULT
         if self.currentState == 'IDLE':
             self.animationspeed = ANIMSPEED_HERO_IDLE
 
+        # Selects correct sprite sheet
         spriteSheet = self.spriteSheets[self.currentState]
         self.currentAnimation = spriteSheet.getSprites(flipped = not self.facingRight)
 
@@ -133,3 +176,18 @@ class Hero():
             self.rect.right = WINDOW_WIDTH
 
         self.xpos = self.rect.centerx
+
+
+    def moveVertical(self, level):
+        # Apply gravity
+        self.yVel += self.gravity
+        self.ypos += self.yVel
+
+        # Simulate ground 
+        ground_level = 400
+        if self.ypos >= ground_level:
+            self.ypos = ground_level
+            self.yVel = 0
+            self.isJumping = False
+            if self.currentState == 'JUMP':
+                self.currentState = 'IDLE'
