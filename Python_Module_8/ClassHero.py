@@ -31,16 +31,6 @@ attackSprites = [
     (676, 0, 92, 80)
 ]
 
-jumpSprites = [
-    (0, 0, 120, 64),
-    (120, 0, 120, 64),
-    (240, 0, 120, 64),
-    (360, 0, 120, 64),
-    (480, 0, 120, 64),
-    (600, 0, 120, 64),
-    (720, 0, 120, 64),
-    (840, 0, 120, 64)
-]
 
 class Hero():
 
@@ -51,18 +41,15 @@ class Hero():
         idlepath = os.path.join(SPRITESHEET_PATH, "Character","Idle", "Idle-Sheet.png")
         runpath = os.path.join(SPRITESHEET_PATH, "Character","Run","Run-Sheet.png")
         runattack = os.path.join(SPRITESHEET_PATH, "Character","Attack","AttackSheet.png")
-        jumppath = os.path.join(SPRITESHEET_PATH, "Character", "Jump","JumpSheet.png")
 
         idleSpriteSheet = SpriteSheet(idlepath, idleSprites)
         runSpriteSheet = SpriteSheet(runpath, runSprties)
         attackSpriteSheet = SpriteSheet(runattack, attackSprites)
-        jumpSpriteSheet = SpriteSheet(jumppath, jumpSprites)
 
         self.spriteSheets = {
             'IDLE' : SpriteSheet(idlepath, idleSprites),
             'RUN' : SpriteSheet(runpath, runSprties),
-            'ATTACK' : SpriteSheet(runattack, attackSprites),
-            'JUMP' : SpriteSheet(jumppath, jumpSprites)
+            'ATTACK' : SpriteSheet(runattack, attackSprites)
         }
 
         self.animationIndex = 0
