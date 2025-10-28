@@ -10,13 +10,15 @@ virusSprites = [
     ]
 
 
-class VirusRed():
+class VirusRed(pygame.sprite.Sprite):
 
     def __init__(self,position,moveRight):
+        super().__init__()
+
         # Load spritesheet
         viruspath = os.path.join(SPRITESHEET_PATH, "Enemies","Virus_Red", "virus1_red.png")
         self.flySpriteSheet = SpriteSheet(os.path.join(viruspath),virusSprites)
-
+        self.attackSpriteSheet = SpriteSheet(SPRITESHEET_PATH + "AttackSheet.png", virusSprites)
 
         #Gets image from directory 
         self.image = self.flySpriteSheet.getSprites(moveRight)[0]
@@ -40,19 +42,42 @@ class VirusRed():
         elif self.rect.left > WINDOW_WIDTH:
             self.movingRight = False
 
+        #Trigger attack animation code:
+        heroRect = level.hero.sprite.rect
+        heroX = heroRect.centerx
+        if self.currentState == 'FLY':
+            if heroRect.top < self.rect.bottom <= heroRect.bottom:
+                if self.movingRight == True:
+                    if self.rect.left < heroX and self.rect.right > heroX - 50:
+                        self.currentState = 'ATTACK'
+                        self.animationIndex = 0
+                    else:
+                        if self.rect.right > heroX and self.rect.left < heroX + 50:
+                            self.currentState = 'ATTACK'
+                            self.animationIndex = 0
+        elif self.currentState == 'ATTACK':
+            if self.movingRight == True:
+                if self.rect.left >= heroX or self.rect.right < heroX - 50:
+                    self.currentState = 'FLY'
+                    self.animationIndex = 0 
+                else:
+                    if self.rect.right <= heroX or self.rect.left > heroX + 50:
+                        self.currentState = 'FLY'
+                        self.animationIndex = 0
+
         # Select animation for current state
         self.selectAnimation()
 
         # Animate sprite
         self.animationIndex += self.animationSpeed
         if self.animationIndex >= len(self.currentAnimation):
-            self.animationIndex = 0
+            if self.currentState == 'ATTACK':
+                self.animationIndex = len (self.currentAnimation) -1
+            else:
+                self.currentState = 'FLY'
+                self.animationIndex = 0
 
         self.image = self.currentAnimation[int(self.animationIndex)]
-
-    def draw(self,displaySurface):
-        displaySurface.blit(self.image,self.rect)
-        pass
 
     def selectAnimation(self):
         self.animationSpeed = ANIMSPEED_VIRUS

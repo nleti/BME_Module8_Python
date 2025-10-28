@@ -32,9 +32,10 @@ attackSprites = [
 ]
 
 
-class Hero():
+class Hero(pygame.sprite.Sprite):
 
     def __init__(self, position, faceRight):
+        super().__init__()
 
         # Load Sprites
         # Paths to get the character animations
@@ -136,11 +137,6 @@ class Hero():
         # Move Hero
         self.moveHorizontal(level)
         self.moveVertical(level)
-
-
-    def draw(self, displaySurface):
-        displaySurface.blit(self.image, self.rect)
-
 
 
     def selectAnimation(self):
