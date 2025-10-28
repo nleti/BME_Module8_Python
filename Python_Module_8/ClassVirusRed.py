@@ -20,14 +20,18 @@ class VirusRed(pygame.sprite.Sprite):
         viruspath = os.path.join(SPRITESHEET_PATH, "Enemies","Virus_Red", "virus1_red.png")
         self.flySpriteSheet = SpriteSheet(os.path.join(viruspath),virusSprites)
 
-        # Attack sprite sheet
         virusattackpath = os.path.join(SPRITESHEET_PATH, "Enemies", "Virus_Red","virus1_red_ATTACK.png")
         self.attackSpriteSheet = SpriteSheet(os.path.join(virusattackpath), virusSprites)
+
+        virushitpath = os.path.join(SPRITESHEET_PATH,"Enemies", "Virus_Red","virus1_red_HIT.png")
+        self.hitSpriteSheet = SpriteSheet(os.path.join(virushitpath),virusSprites)
+
 
         # Initialise sprite image and position 
         self.image = self.flySpriteSheet.getSprites(moveRight)[0]
         self.rect = self.image.get_rect(bottomleft = position)
         self.movingRight = moveRight
+        self.yDir = 0
 
         # Animation State
         self.animationIndex = 0
@@ -36,7 +40,7 @@ class VirusRed(pygame.sprite.Sprite):
 
 
     def update(self, level):
-        heroRect = level.hero.rect
+        heroRect = level.hero.sprite.rect
         heroX = heroRect.centerx
 
         # Move horizontally
@@ -51,6 +55,13 @@ class VirusRed(pygame.sprite.Sprite):
             self.movingRight = True
         elif self.rect.left > WINDOW_WIDTH:
             self.movingRight = False
+
+        if self.currentState == "DYING":
+            self.yDir += GRAVITY
+            self.rect.y += self.yDir
+            if self.rect.top > WINDOW_HEIGHT:
+                self.kill()
+
 
 
         # --- Attack Logic ---
@@ -91,7 +102,7 @@ class VirusRed(pygame.sprite.Sprite):
         # --- Animate sprite ---
         self.animationIndex += self.animationSpeed
         if self.animationIndex >= len(self.currentAnimation):
-            if self.currentState == 'ATTACK':
+            if self.currentState == 'ATTACK' or self.currentState == "DYING":
                 # Keep attack animation on last frame
                 self.animationIndex = len (self.currentAnimation) -1
             else:
@@ -111,9 +122,10 @@ class VirusRed(pygame.sprite.Sprite):
             self.currentAnimation = self.flySpriteSheet.getSprites(flipped = self.movingRight)
         elif self.currentState == "ATTACK":
             self.currentAnimation = self.attackSpriteSheet.getSprites(flipped=self.movingRight)
-
-
-    def draw(self,displaySurface):
-        # Draw sprite on the given surface
-        displaySurface.blit(self.image,self.rect)
-        pass
+        else:
+            self.currentAnimation = self.hitSpriteSheet.getSprites(flipped = self.movingRight)
+    
+    def die(self):
+        if self.currentState != "DYING":
+            self.animationIndex = 0
+            self.currentState = "DYING"
