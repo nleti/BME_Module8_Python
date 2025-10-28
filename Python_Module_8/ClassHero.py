@@ -185,20 +185,30 @@ class Hero(pygame.sprite.Sprite):
 
 
     def moveVertical(self, level):
-        """Apply gravity and simulate ground"""
-
+        """Apply gravity and simulate ground and falling off map"""
         self.yVel += self.gravity
         self.ypos += self.yVel
+        self.rect.centery = self.ypos
 
+        # Collision detection with platforms
+        collided_tiles = pygame.sprite.spritecollide(self, level.platformTiles, False)
+        if collided_tiles:
+            for tile in collided_tiles:
+                if self.yVel > 0:  # falling
+                    self.rect.bottom = tile.rect.top
+                    self.ypos = self.rect.centery
+                    self.yVel = 0
+                    self.isJumping = False
+                    if self.currentState == 'JUMP':
+                        self.currentState = 'IDLE'
+                elif self.yVel < 0:  # hitting head
+                    self.rect.top = tile.rect.bottom
+                    self.ypos = self.rect.centery
+                    self.yVel = 0
 
-        # Simulate ground level
-        ground_level = 400
-        if self.ypos >= ground_level:
-            self.ypos = ground_level
-            self.yVel = 0
-            self.isJumping = False
-            if self.currentState == 'JUMP':
-                self.currentState = 'IDLE'
+        # Check if fallen off the map
+        if self.rect.top > WINDOW_HEIGHT:
+            self.die()
     
     def die(self):
         if self.currentState != "DIE":

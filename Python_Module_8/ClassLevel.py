@@ -7,21 +7,32 @@ from ClassBackground import Background
 from ClassVirusRed import VirusRed
 from ClassTile import Tile
 from ClassVirusGreen import VirusGreen
+from ClassCollectible import Collectible
 
 class Level():
     def __init__(self,displaySurface):
         #Load the level tmx file
-        self.levelData = load_pygame(LEVEL_PATH + "level1/level.tmx")
+        self.levelData = load_pygame(os.path.join( LEVELS_PATH, "level.tmx"))
 
-        self.background = Background()
+
         
-        # Groups for organizing our sprites
+        self.background = Background()
         self.hero = pygame.sprite.GroupSingle()
         self.viruses = pygame.sprite.Group()
         self.platformTiles = pygame.sprite.Group()
+        self.backgroundTiles = pygame.sprite.Group()
+        self.collectibles = pygame.sprite.Group()
 
         # Pull the platform tile layer from the TMX level
         layer = self.levelData.get_layer_by_name('Platforms')
+
+        for bg_layer in self.levelData.visible_layers:
+            # Skip the platform layer
+             if bg_layer.name != 'Platforms' and hasattr(bg_layer, 'tiles'):
+                for x, y, surface in bg_layer.tiles():
+                    tile = Tile((x * TILESIZE, y * TILESIZE), surface)
+                    self.backgroundTiles.add(tile)
+
 
         # Loop through each tile in the Platforms layer and create Tile sprites
         for x, y, tileSurface in  layer.tiles():
@@ -38,22 +49,52 @@ class Level():
         self.displaySurface = displaySurface
 
     def update(self):
-        # Update hero logic (movement, physics, collision, etc.)
         self.hero.update(self)
-
-        # Update viruses (movement, behavior, etc.)
         self.viruses.update(self)
  
       
     def draw(self):
-        self.background.draw(self.displaySurface)
-        # Draw static platform tiles
-        self.platformTiles.draw(self.displaySurface)
-        self.hero.draw(self.displaySurface)
-        self.viruses.draw(self.displaySurface)
+        self.background.draw(self.displaySurface)          # static background
+        self.backgroundTiles.draw(self.displaySurface)    # tiled background layers
+        self.platformTiles.draw(self.displaySurface)      # platforms
+        self.viruses.draw(self.displaySurface)           # enemies
+        self.hero.draw(self.displaySurface)               # hero on top
 
-    # Draw the hero manually because GroupSingle doesn't auto-draw sprites
+
     def run(self):
         # Game loop call: update logic then draw everything to the screen
         self.update()
         self.draw()
+
+
+    def showEndingScreen(self):
+        # Create a transparent overlay
+        overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))  # RGBA: last value is alpha (0=transparent, 255=opaque)
+
+        # Draw overlay
+        self.displaySurface.blit(overlay, (0, 0))
+
+        # Draw text on top
+        font = pygame.font.Font(None, 64)
+        text = font.render("Game Over", True, (255, 0, 0))
+        subtext = pygame.font.Font(None, 36).render("Press R to Restart", True, (255, 255, 255))
+
+        text_rect = text.get_rect(center=(WINDOW_WIDTH//2, WINDOW_HEIGHT//2 - 50))
+        subtext_rect = subtext.get_rect(center=(WINDOW_WIDTH//2, WINDOW_HEIGHT//2 + 20))
+        self.displaySurface.blit(text, text_rect)
+        self.displaySurface.blit(subtext, subtext_rect)
+
+        # Update display
+        pygame.display.update()
+
+        # Wait for player to press R
+        waiting = True
+        while waiting:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        waiting = False

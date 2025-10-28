@@ -27,6 +27,11 @@ while isGameRunning:
 
     level.run()
 
+    # Check if hero is dead
+    if level.hero.sprite.currentState == "DIE":
+        level.showEndingScreen()       # Show the Game Over screen
+        level = Level(displaySurface)  # Restart level after player presses R
+
     pygame.display.flip()
     clock.tick(60)
 

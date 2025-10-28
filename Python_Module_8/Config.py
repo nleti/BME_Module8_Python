@@ -4,7 +4,7 @@ BASE_DIR = os.path.dirname(__file__)
 
 # Join paths safely across all operating systems
 SPRITESHEET_PATH = os.path.join(BASE_DIR, "Assets", "SpriteSheets", "Virus Game")
-LEVELS_PATH = ""
+LEVELS_PATH = os.path.join(BASE_DIR, "Assets")
 
 # Window Settings
 WINDOW_WIDTH,WINDOW_HEIGHT = 960, 540
