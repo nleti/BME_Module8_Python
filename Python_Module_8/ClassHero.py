@@ -174,3 +174,7 @@ class Hero(pygame.sprite.Sprite):
             self.isJumping = False
             if self.currentState == 'JUMP':
                 self.currentState = 'IDLE'
+
+    def draw(self,displaySurface):
+        displaySurface.blit(self.image,self.rect)
+        pass
