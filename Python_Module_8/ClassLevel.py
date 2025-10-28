@@ -42,8 +42,10 @@ class Level():
         
         # Add hero to the level (starting position + facing direction) 
         self.hero.add(Hero((32, 464), faceRight = True))
-        self.viruses.add(VirusRed((200,400),moveRight = True))
-        self.viruses.add(VirusRed((300,300),moveRight = False))
+        self.viruses.add(VirusRed((500,300),moveRight = True))
+        self.viruses.add(VirusRed((500,350),moveRight = False))
+        self.viruses.add(VirusRed((200,280),moveRight = False))
+        self.viruses.add(VirusRed((800,500),moveRight = True))
         
         # The surface we draw everything on (screen from main game loop)
         self.displaySurface = displaySurface

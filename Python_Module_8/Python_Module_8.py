@@ -37,3 +37,4 @@ while isGameRunning:
 
 # After game closed,close pygame
 pygame.quit()
+w
