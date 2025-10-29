@@ -44,7 +44,7 @@ class Level():
         self.viruses.add(VirusRed((500,300),moveRight = True))
         self.viruses.add(VirusRed((500,350),moveRight = False))
         self.viruses.add(VirusRed((200,280),moveRight = False))
-        self.viruses.add(VirusRed((700,500),moveRight = True))
+        self.viruses.add(VirusRed((700,400),moveRight = True))
         self.viruses.add(VirusRed((100,100),moveRight = False))
         
         # Surface to draw everything on
