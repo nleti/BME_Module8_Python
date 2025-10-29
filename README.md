@@ -5,8 +5,6 @@
 * Student3 Name & Number: Yashvi Goswami, S5874645
 * Student4 Name & Number: Roxana-Ionela Grozea, S5887917
 
-## PLEASE INSTALL PYTMX AND PYGAME TO RUN THE GAME
-
 We created a game that takes place inside the human blood vessel where you play as a white blood cell in human form. 
 You travel through the bloodstream, protecting the body and eliminating harmful pathogens.
 Your main goal is to defeat the adenoviruses. Along the way, there are different obstacles you have to deal with such
@@ -25,3 +23,5 @@ KEYBOARD INPUTS:
 * SPACE - attack
 
 * R - restart once dead
+
+## PLEASE INSTALL PYTMX AND PYGAME TO RUN THE GAME
