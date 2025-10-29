@@ -218,6 +218,11 @@ class Hero(pygame.sprite.Sprite):
 
 
     def checkEnemyCollisions(self,enemies):
+        """ Handle collisions between the hero and enemies.
+        - If attacking and facing the enemy, the enemy dies.
+        - If not attacking and colliding with a live enemy, the hero dies.
+        """
+
         collidedSprites = pygame.sprite.spritecollide(self,enemies, False)
         for enemy in collidedSprites:
             if self.currentState == "ATTACK":
