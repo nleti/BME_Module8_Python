@@ -26,6 +26,12 @@ class VirusRed(pygame.sprite.Sprite):
         virushitpath = os.path.join(SPRITESHEET_PATH,"Enemies", "Virus_Red","virus1_red_HIT.png")
         self.hitSpriteSheet = SpriteSheet(os.path.join(virushitpath),virusSprites)
 
+        # Store spritesheets in a dictionary for easier animation selection
+        self.spriteSheets = {
+            'FLY': self.flySpriteSheet,
+            'ATTACK': self.attackSpriteSheet,
+            'DYING': self.hitSpriteSheet
+        }
 
         # Initialise sprite image and position 
         self.image = self.flySpriteSheet.getSprites(moveRight)[0]
@@ -36,18 +42,27 @@ class VirusRed(pygame.sprite.Sprite):
         # Animation State
         self.animationIndex = 0
         self.currentState = "FLY"
+        self.currentAnimation = self.flySpriteSheet.getSprites(moveRight)
 
-
+    def selectAnimation(self):
+        """Update the current animation based on current state."""
+        if self.currentState == "FLY":
+            self.currentAnimation = self.flySpriteSheet.getSprites(self.movingRight)
+        elif self.currentState == "ATTACK":
+            self.currentAnimation = self.attackSpriteSheet.getSprites(self.movingRight)
+        elif self.currentState == "DYING":
+            self.currentAnimation = self.hitSpriteSheet.getSprites(self.movingRight)
 
     def update(self, level):
         heroRect = level.hero.sprite.rect
         heroX = heroRect.centerx
 
         # Move horizontally
-        if not self.movingRight:
-            self.rect.x -= SPEED_VIRUS_RED
-        else:
-            self.rect.x += SPEED_VIRUS_RED
+        if self.currentState != "DYING":
+            if not self.movingRight:
+                self.rect.x -= SPEED_VIRUS_RED
+            else:
+                self.rect.x += SPEED_VIRUS_RED
 
 
         # Turn around when leaving window bounds
@@ -89,43 +104,23 @@ class VirusRed(pygame.sprite.Sprite):
                     self.currentState = 'FLY'
                     self.animationIndex = 0 
 
-             else:
-                    if self.rect.left > heroX or self.rect.left < heroX - 60:
-                        self.currentState = 'FLY'
-                        self.animationIndex = 0
+        
 
-
-        # Select animation for current state
+        # --- Update animation ---
         self.selectAnimation()
-
-
-        # --- Animate sprite ---
-        self.animationIndex += self.animationSpeed
+        self.animationIndex += ANIMSPEED_VIRUS
         if self.animationIndex >= len(self.currentAnimation):
-            if self.currentState == 'ATTACK' or self.currentState == "DYING":
-                # Keep attack animation on last frame
-                self.animationIndex = len (self.currentAnimation) -1
+            if self.currentState in ["ATTACK", "DYING"]:
+                self.animationIndex = len(self.currentAnimation) - 1
             else:
-                # Loop fly animation
-                self.currentState = 'FLY'
                 self.animationIndex = 0
-
         self.image = self.currentAnimation[int(self.animationIndex)]
 
-
-    def selectAnimation(self):
-        # Set the animation speed
-        self.animationSpeed = ANIMSPEED_VIRUS
-
-        # Choose animation based on current state
-        if self.currentState == "FLY":
-            self.currentAnimation = self.flySpriteSheet.getSprites(flipped = self.movingRight)
-        elif self.currentState == "ATTACK":
-            self.currentAnimation = self.attackSpriteSheet.getSprites(flipped=self.movingRight)
-        else:
-            self.currentAnimation = self.hitSpriteSheet.getSprites(flipped = self.movingRight)
-    
     def die(self):
+        """Set the virus to dying state and update animation."""
         if self.currentState != "DYING":
-            self.animationIndex = 0
             self.currentState = "DYING"
+            self.animationIndex = 0
+            # Switch animation to the hit/dying animation
+            self.currentAnimation = self.hitSpriteSheet.getSprites(self.movingRight)
+        
