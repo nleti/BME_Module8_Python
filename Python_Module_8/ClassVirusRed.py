@@ -89,43 +89,4 @@ class VirusRed(pygame.sprite.Sprite):
                     self.currentState = 'FLY'
                     self.animationIndex = 0 
 
-             else:
-                    if self.rect.left > heroX or self.rect.left < heroX - 60:
-                        self.currentState = 'FLY'
-                        self.animationIndex = 0
-
-
-        # Select animation for current state
-        self.selectAnimation()
-
-
-        # --- Animate sprite ---
-        self.animationIndex += self.animationSpeed
-        if self.animationIndex >= len(self.currentAnimation):
-            if self.currentState == 'ATTACK' or self.currentState == "DYING":
-                # Keep attack animation on last frame
-                self.animationIndex = len (self.currentAnimation) -1
-            else:
-                # Loop fly animation
-                self.currentState = 'FLY'
-                self.animationIndex = 0
-
-        self.image = self.currentAnimation[int(self.animationIndex)]
-
-
-    def selectAnimation(self):
-        # Set the animation speed
-        self.animationSpeed = ANIMSPEED_VIRUS
-
-        # Choose animation based on current state
-        if self.currentState == "FLY":
-            self.currentAnimation = self.flySpriteSheet.getSprites(flipped = self.movingRight)
-        elif self.currentState == "ATTACK":
-            self.currentAnimation = self.attackSpriteSheet.getSprites(flipped=self.movingRight)
-        else:
-            self.currentAnimation = self.hitSpriteSheet.getSprites(flipped = self.movingRight)
-    
-    def die(self):
-        if self.currentState != "DYING":
-            self.animationIndex = 0
-            self.currentState = "DYING"
+        
