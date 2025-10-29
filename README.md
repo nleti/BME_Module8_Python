@@ -25,3 +25,4 @@ KEYBOARD INPUTS:
 * R - restart once dead
 
 ## PLEASE INSTALL PYTMX AND PYGAME TO RUN THE GAME
+for any questions please email l.godoy.inacio@student.rug.nl
